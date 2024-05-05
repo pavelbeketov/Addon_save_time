@@ -1,7 +1,7 @@
 bl_info = {
     "name": "Save time",
     "author": "Beketov",
-    "version": (1, 0),
+    "version": (1, 5),
     "blender": (4, 0, 2),
     "location": "View3D > N > Custom Addon",
     "description": "Work with many 3d models",
@@ -140,11 +140,11 @@ class ExportModelOperator(bpy.types.Operator):
     bl_label = "Export"
     
     def execute(self, context):
-# Получаем текущий номер папки
+        # Получаем текущий номер папки
         current_folder_number = 1
         
         while True:
-            folder_name = f"Новая_папка_{current_folder_number}"
+            folder_name = f"Model_{current_folder_number}"
             folder_path = bpy.path.abspath("//" + folder_name)
             # Проверяем существует ли папка, если нет, то создаем
             if not os.path.exists(folder_path):
@@ -153,16 +153,14 @@ class ExportModelOperator(bpy.types.Operator):
             current_folder_number += 1
     
         # Получаем имя файла для экспорта
-        file_name = "модель.obj"
+        file_name = f"Shoes_{current_folder_number}.glb"
         file_path = os.path.join(folder_path, file_name)
     
         # Экспортируем модель
         blend_file_path = file_path
         directory = os.path.dirname(blend_file_path)
-        export_file_path = os.path.join(directory, "Strap_New") 
-        bpy.ops.export_scene.gltf(filepath=export_file_path, use_selection=True)
-          
-
+        bpy.ops.export_scene.gltf(filepath=file_path, use_selection=True)
+        
         return {'FINISHED'}
 
 
