@@ -21,6 +21,9 @@ file_list = []
 # Путь к папке с 3D моделями
 models_folder_path = "C:\\3D\\Test\\"
 
+# Путь к папке для эспорта новых 3D моделей
+output_folder = "C:\\3D\\Test\\test2\\"
+
 # Переменная для хранения индекса текущего файла
 current_file_index = 0
 
@@ -63,7 +66,7 @@ def get_glb_files_in_folder(folder_path):
 # Определение оператора для перехода на уровень выше
 class GoUpLevelOperator(bpy.types.Operator):
     bl_idname = "object.go_up_level"
-    bl_label = "Go Up Level"
+    bl_label = "Reset"
     
     def execute(self, context):
         global current_file_index, file_list
@@ -130,7 +133,41 @@ class RotateModelYOperator(bpy.types.Operator):
         return {'FINISHED'}
 
 
+#-------------------
+# Определение оператора для экспорта 3D модели
+class RotateModelYOperator(bpy.types.Operator):
+    bl_idname = "object.export_model"
+    bl_label = "Export"
+    
+    def execute(self, context):
 
+# Создаем папку, если она не существует
+        os.makedirs(output_folder, exist_ok=True)
+
+# Начальный номер для файла
+        file_number = 1
+
+# Пока файл с таким номером существует, увеличиваем номер
+        while os.path.exists(os.path.join(output_folder, f"{file_number}.glb")):
+            file_number += 1
+
+# Формируем имя файла
+        output_file = os.path.join(output_folder, f"{file_number}.glb")
+
+# Выбираем объекты, которые хотим экспортировать
+        objects_to_export = bpy.context.selected_objects
+
+# Экспортируем объекты в формате JLB
+        blend_file_path = output_folder
+        directory = os.path.dirname(blend_file_path)
+        export_file_path = os.path.join(directory, output_file) 
+        bpy.ops.export_scene.gltf(filepath=export_file_path, use_selection=True)
+
+
+        return {'FINISHED'}
+
+
+#-----------------------------
 
 # Определение панели для отображения кнопок
 class ModelImportPanel(bpy.types.Panel):
@@ -145,7 +182,7 @@ class ModelImportPanel(bpy.types.Panel):
         # Добавляем кнопку для загрузки следующего файла
         layout.operator("object.load_next_file", text="Load Next File")
         # Добавляем кнопку для перехода на уровень выше
-        layout.operator("object.go_up_level", text="Go Up Level")
+        layout.operator("object.go_up_level", text="Reset")
 
 # Определение панели для отображения кнопок вращения модели
 class RotateModelPanel(bpy.types.Panel):
@@ -167,6 +204,21 @@ class RotateModelPanel(bpy.types.Panel):
         layout.operator("object.join_model", text="Join")
     
 
+
+
+# Определение панели для экспорта 3D модели
+class ExportModelPanel(bpy.types.Panel):
+    bl_label = "Export Model Panel"
+    bl_idname = "OBJECT_PT_Export_model_panel"
+    bl_space_type = 'VIEW_3D'
+    bl_region_type = 'UI'
+    bl_category = "Custom Addon" # Название вашей вкладки
+
+    def draw(self, context):
+        layout = self.layout
+        layout.operator("object.export_model", text="Export")
+
+
 # Регистрация классов
 def register():
     bpy.utils.register_class(LoadNextFileOperator)
@@ -177,6 +229,7 @@ def register():
     bpy.utils.register_class(ModelImportPanel)
     bpy.utils.register_class(RotateModelPanel)
     bpy.utils.register_class(ModelJoinOperator)
+    bpy.utils.register_class(ExportModelPanel)
     
 def unregister():
     bpy.utils.unregister_class(LoadNextFileOperator)
@@ -187,7 +240,7 @@ def unregister():
     bpy.utils.unregister_class(ModelImportPanel)
     bpy.utils.unregister_class(RotateModelPanel)
     bpy.utils.unregister_class(ModelJoinOperator)
-    
+    bpy.utils.unregister_class(ExportModelPanel)
     
 # Запуск аддона
 if __name__ == "__main__":
