@@ -227,8 +227,7 @@ def register():
     bpy.utils.register_class(ModelImportPanel)
     bpy.utils.register_class(RotateModelPanel)
     bpy.utils.register_class(ModelJoinOperator)
-    bpy.utils.register_class(ExportModelOperator)
-    
+    bpy.utils.register_class(ExportModelOperator)    
     bpy.utils.register_class(ExportModelPanel)
     
 def unregister():
@@ -241,7 +240,6 @@ def unregister():
     bpy.utils.unregister_class(RotateModelPanel)
     bpy.utils.unregister_class(ModelJoinOperator)
     bpy.utils.unregister_class(ExportModelOperator)
-    
     bpy.utils.unregister_class(ExportModelPanel)
     
 # Запуск аддона
