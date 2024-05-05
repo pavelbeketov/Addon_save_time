@@ -27,6 +27,12 @@ models_folder_path = "C:\\3D\\Test\\"
 # Переменная для хранения индекса текущего файла
 current_file_index = 0
 
+
+class MyAddonProperties(bpy.types.PropertyGroup):
+    models_folder_path: bpy.props.StringProperty(name="Models Folder Path", subtype='DIR_PATH')
+
+
+
 # Определение оператора для загрузки следующего файла из папки
 class LoadNextFileOperator(bpy.types.Operator):
     bl_idname = "object.load_next_file"
@@ -167,6 +173,23 @@ class ExportModelOperator(bpy.types.Operator):
 
 #-----------------------------
 
+
+class MyAddonPanel(bpy.types.Panel):
+    bl_label = "My Addon Panel"
+    bl_idname = "PT_MyAddonPanel"
+    bl_space_type = 'VIEW_3D'
+    bl_region_type = 'UI'
+    bl_category = 'Custom Addon'
+
+    def draw(self, context):
+        layout = self.layout
+        scene = context.scene
+        my_addon = scene.my_addon
+
+        layout.prop(my_addon, "models_folder_path")
+        
+        
+
 # Определение панели для отображения кнопок
 class ModelImportPanel(bpy.types.Panel):
     bl_label = "Model Import Panel"
@@ -181,7 +204,10 @@ class ModelImportPanel(bpy.types.Panel):
         layout.operator("object.load_next_file", text="Load Next File")
         # Добавляем кнопку для перехода на уровень выше
         layout.operator("object.go_up_level", text="Reset")
-
+        
+            
+        
+        
 # Определение панели для отображения кнопок вращения модели
 class RotateModelPanel(bpy.types.Panel):
     bl_label = "Rotate Model Panel"
@@ -227,8 +253,13 @@ def register():
     bpy.utils.register_class(ModelImportPanel)
     bpy.utils.register_class(RotateModelPanel)
     bpy.utils.register_class(ModelJoinOperator)
-    bpy.utils.register_class(ExportModelOperator)    
+    bpy.utils.register_class(ExportModelOperator)
+    
     bpy.utils.register_class(ExportModelPanel)
+    
+    bpy.utils.register_class(MyAddonProperties)
+    bpy.types.Scene.my_addon = bpy.props.PointerProperty(type=MyAddonProperties)
+    bpy.utils.register_class(MyAddonPanel)
     
 def unregister():
     bpy.utils.unregister_class(LoadNextFileOperator)
@@ -240,7 +271,12 @@ def unregister():
     bpy.utils.unregister_class(RotateModelPanel)
     bpy.utils.unregister_class(ModelJoinOperator)
     bpy.utils.unregister_class(ExportModelOperator)
+    
     bpy.utils.unregister_class(ExportModelPanel)
+    
+    bpy.utils.unregister_class(MyAddonProperties)
+    del bpy.types.Scene.my_addon
+    bpy.utils.unregister_class(MyAddonPanel)
     
 # Запуск аддона
 if __name__ == "__main__":
