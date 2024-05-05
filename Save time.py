@@ -22,7 +22,7 @@ file_list = []
 models_folder_path = "C:\\3D\\Test\\"
 
 # Путь к папке для эспорта новых 3D моделей
-output_folder = "C:\\3D\\Test\\test2\\"
+#output_folder = "C:\\3D\\Test\\test2\\"
 
 # Переменная для хранения индекса текущего файла
 current_file_index = 0
@@ -135,36 +135,36 @@ class RotateModelYOperator(bpy.types.Operator):
 
 #-------------------
 # Определение оператора для экспорта 3D модели
-class RotateModelYOperator(bpy.types.Operator):
+class ExportModelOperator(bpy.types.Operator):
     bl_idname = "object.export_model"
     bl_label = "Export"
     
     def execute(self, context):
-
-# Создаем папку, если она не существует
-        os.makedirs(output_folder, exist_ok=True)
-
-# Начальный номер для файла
-        file_number = 1
-
-# Пока файл с таким номером существует, увеличиваем номер
-        while os.path.exists(os.path.join(output_folder, f"{file_number}.glb")):
-            file_number += 1
-
-# Формируем имя файла
-        output_file = os.path.join(output_folder, f"{file_number}.glb")
-
-# Выбираем объекты, которые хотим экспортировать
-        objects_to_export = bpy.context.selected_objects
-
-# Экспортируем объекты в формате JLB
-        blend_file_path = output_folder
+# Получаем текущий номер папки
+        current_folder_number = 1
+        
+        while True:
+            folder_name = f"Новая_папка_{current_folder_number}"
+            folder_path = bpy.path.abspath("//" + folder_name)
+            # Проверяем существует ли папка, если нет, то создаем
+            if not os.path.exists(folder_path):
+                os.makedirs(folder_path)
+                break
+            current_folder_number += 1
+    
+        # Получаем имя файла для экспорта
+        file_name = "модель.obj"
+        file_path = os.path.join(folder_path, file_name)
+    
+        # Экспортируем модель
+        blend_file_path = file_path
         directory = os.path.dirname(blend_file_path)
-        export_file_path = os.path.join(directory, output_file) 
+        export_file_path = os.path.join(directory, "Strap_New") 
         bpy.ops.export_scene.gltf(filepath=export_file_path, use_selection=True)
-
+          
 
         return {'FINISHED'}
+
 
 
 #-----------------------------
@@ -229,7 +229,7 @@ def register():
     bpy.utils.register_class(ModelImportPanel)
     bpy.utils.register_class(RotateModelPanel)
     bpy.utils.register_class(ModelJoinOperator)
-    bpy.utils.register_class(ExportModelPanel)
+    bpy.utils.register_class(ExportModelOperator)
     
 def unregister():
     bpy.utils.unregister_class(LoadNextFileOperator)
@@ -240,7 +240,7 @@ def unregister():
     bpy.utils.unregister_class(ModelImportPanel)
     bpy.utils.unregister_class(RotateModelPanel)
     bpy.utils.unregister_class(ModelJoinOperator)
-    bpy.utils.unregister_class(ExportModelPanel)
+    bpy.utils.unregister_class(ExportModelOperator)
     
 # Запуск аддона
 if __name__ == "__main__":
